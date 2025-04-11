@@ -212,7 +212,7 @@ function VoiceCreate() {
 
         <div className="bg-slate-50 rounded-md p-6">
           <p className="text-lg font-medium text-gray-800 mb-4">
-            “안녕하세요. 지금 제 목소리를 녹음하고 있어요. 또렷하게 들리시나요? 감사합니다.”
+            “ 안녕하세요. 지금 제 목소리를 녹음하고 있어요. 또렷하게 들리시나요? 감사합니다. ”
           </p>
 
           <div className="flex items-center space-x-4">
