@@ -243,9 +243,9 @@ function VoiceCreate() {
         </div>
         <div className="mt-6 flex justify-end">
           <GradientButton
-            className="px-6 py-3"
+            className="px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleCreateVoicePack}
-            disabled={loading}
+            disabled={loading || !voicePackName.trim() || !audioBlob}
           >
             생성하기
           </GradientButton>
