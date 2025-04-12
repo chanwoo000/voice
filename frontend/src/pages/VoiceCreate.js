@@ -77,35 +77,6 @@ function VoiceCreate() {
     };
   }, [audioBlob]);
 
-  const pollVoicePackStatus = async (voicePackId) => {
-    const interval = 2000; // 2초 간격
-    const maxAttempts = 10;
-    let attempts = 0;
-
-    return new Promise((resolve, reject) => {
-      const check = async () => {
-        try {
-          const res = await axiosInstance.get(`/voicepack/status?id=${voicePackId}`);
-          const status = res.data.status;
-          console.log('📡 상태 체크:', status);
-
-          if (status === 'completed') {
-            resolve();
-          } else if (attempts >= maxAttempts) {
-            reject(new Error('타임아웃: 작업 완료되지 않음'));
-          } else {
-            attempts++;
-            setTimeout(check, interval);
-          }
-        } catch (err) {
-          reject(err);
-        }
-      };
-
-      check(); // 첫 시도
-    });
-  };
-
   const handleStartRecording = async () => {
     if (!isFFmpegLoaded) return alert('FFmpeg 로딩 중입니다.');
 
@@ -172,29 +143,22 @@ function VoiceCreate() {
   };
 
   const handleCreateVoicePack = async () => {
-    console.log('🎯 handleCreateVoicePack 실행됨');
+    console.log('🎯 handleCreateVoicePack 실행됨'); // 🔍 여기도 찍히는지 확인
     if (!voicePackName.trim() || !audioBlob) {
       alert('이름과 녹음이 필요합니다.');
       return;
     }
 
     try {
-      const res = await convertVoice(voicePackName, audioBlob, 7);
-      console.log('🟢 convertVoice 응답:', res);
-
-      const voicePackId = res.voicePackId; // ✅ 서버가 이걸 줘야 함
-      if (!voicePackId) throw new Error('voicePackId 없음');
-
-      await pollVoicePackStatus(voicePackId); // ✅ 상태 확인 시작
+      const res = await convertVoice(voicePackName, audioBlob, 7,);
+      console.log('🟢 convertVoice 반환값:', res); // 여기도 찍히는지 확인
 
       alert('보이스팩 생성 완료!');
       navigate('/voice-store');
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert('보이스팩 생성 실패');
     }
   };
-
 
   const formatTime = (time) => {
     if (typeof time !== 'number' || isNaN(time)) return '00:00';
