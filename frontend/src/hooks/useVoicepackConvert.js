@@ -16,6 +16,9 @@ const useVoiceConvert = () => {
     formData.append('name', voicePackName);
     formData.append('voiceFile', new File([audioBlob], 'voice.wav', {type: 'audio/wav'}));
 
+    const url = 'voicepack/convert';
+
+
     try {
       setLoading(true);
       setError(null);
