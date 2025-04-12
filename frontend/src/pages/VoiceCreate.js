@@ -20,6 +20,7 @@ function VoiceCreate() {
   const [duration, setDuration] = useState('00:00');
   const [currentTime, setCurrentTime] = useState(0);
   const {convertVoice, loading} = useVoiceConvert();
+  const [isPolling, setIsPolling] = useState(false);
   const navigate = useNavigate();
 
   const ffmpegRef = useRef(null);
@@ -110,7 +111,6 @@ function VoiceCreate() {
 
         const wavBlob = new Blob([outputData.buffer], {type: 'audio/wav'});
         setAudioBlob(wavBlob);
-        console.log('🔊 WAV 변환 완료:', wavBlob);
 
 
         const audioUrl = URL.createObjectURL(wavBlob);
@@ -143,14 +143,13 @@ function VoiceCreate() {
     setIsPlaying((prev) => !prev);
   };
 
-  const pollStatus = async (id, interval = 2000, maxAttempts = 15) => {
+  const pollStatus = async (id, interval = 2000, maxAttempts = 30) => {
     let attempts = 0;
 
     return new Promise((resolve, reject) => {
       const checkStatus = async () => {
         try {
-          const response = await axiosInstance.get(`/voicepack/synthesis/status/${id}`);
-          const data = await response.json();
+          const {data} = await axiosInstance.get(`/voicepack/convert/status/${id}`);
           console.log(data)
           if (data.status === 'COMPLETED') {
             resolve(data);
@@ -176,7 +175,8 @@ function VoiceCreate() {
     }
 
     try {
-      const res = await convertVoice(voicePackName, audioBlob, 7); // 🟢 { id, status }
+      setIsPolling(true); // 폴링 시작 시점
+      const res = await convertVoice(voicePackName, audioBlob, 7);
 
       if (res?.id) {
         const result = await pollStatus(res.id); // 폴링 시작
@@ -187,6 +187,8 @@ function VoiceCreate() {
     } catch (error) {
       console.error('보이스팩 생성 오류:', error);
       alert('보이스팩 생성 실패');
+    } finally {
+      setIsPolling(false); // ✅ 무조건 꺼짐
     }
   };
 
@@ -200,7 +202,7 @@ function VoiceCreate() {
 
   return (
     <>
-      {loading && (
+      {(loading || isPolling) && (
         <div
           className="absolute inset-0 bg-violet-50 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
           <ScaleLoader color="#615FFF" height={40} width={4} radius={2} margin={3}/>
@@ -226,7 +228,8 @@ function VoiceCreate() {
           <div className="flex items-center text-sm text-gray-600 mb-4">
             <p>녹음 가이드를 참고하여, 녹음 버튼을 누르고 아래 문장을 따라 읽어주세요.</p>
             <div className="relative group ml-2">
-              <div className="w-4 h-4 flex items-center justify-center rounded-full bg-indigo-400 text-white text-xs cursor-default">
+              <div
+                className="w-4 h-4 flex items-center justify-center rounded-full bg-indigo-400 text-white text-xs cursor-default">
                 !
               </div>
               <div
