@@ -143,18 +143,15 @@ function VoiceCreate() {
   };
 
   const handleCreateVoicePack = async () => {
+    console.log('🎯 handleCreateVoicePack 실행됨'); // 🔍 여기도 찍히는지 확인
     if (!voicePackName.trim() || !audioBlob) {
       alert('이름과 녹음이 필요합니다.');
       return;
     }
 
     try {
-      await convertVoice({
-        name: voicePackName,
-        blob: audioBlob,
-        // userId: sessionStorage.getItem('userId'),
-        userId:7,
-      });
+      const res = await convertVoice(voicePackName, audioBlob, 7,);
+      console.log('🟢 convertVoice 반환값:', res); // 여기도 찍히는지 확인
 
       alert('보이스팩 생성 완료!');
       navigate('/voice-store');
