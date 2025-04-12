@@ -6,6 +6,7 @@ import WaveSurfer from 'wavesurfer.js';
 import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone';
 import useVoiceConvert from '../hooks/useVoicepackConvert';
 import {ScaleLoader} from 'react-spinners';
+import axiosInstance from '../utils/axiosInstance';
 import GradientButton from "../components/common/GradientButton";
 
 
@@ -142,23 +143,53 @@ function VoiceCreate() {
     setIsPlaying((prev) => !prev);
   };
 
+  const pollStatus = async (id, interval = 2000, maxAttempts = 15) => {
+    let attempts = 0;
+
+    return new Promise((resolve, reject) => {
+      const checkStatus = async () => {
+        try {
+          const response = await axiosInstance.get(`/voicepack/synthesis/status/${id}`);
+          const data = await response.json();
+          console.log(data)
+          if (data.status === 'COMPLETED') {
+            resolve(data);
+          } else if (attempts >= maxAttempts) {
+            reject(new Error('폴링 최대 횟수 초과'));
+          } else {
+            attempts++;
+            setTimeout(checkStatus, interval);
+          }
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      checkStatus();
+    });
+  };
+
   const handleCreateVoicePack = async () => {
-    console.log('🎯 handleCreateVoicePack 실행됨'); // 🔍 여기도 찍히는지 확인
     if (!voicePackName.trim() || !audioBlob) {
       alert('이름과 녹음이 필요합니다.');
       return;
     }
 
     try {
-      const res = await convertVoice(voicePackName, audioBlob, 7,);
-      console.log('🟢 convertVoice 반환값:', res); // 여기도 찍히는지 확인
+      const res = await convertVoice(voicePackName, audioBlob, 7); // 🟢 { id, status }
 
-      alert('보이스팩 생성 완료!');
-      navigate('/voice-store');
-    } catch {
+      if (res?.id) {
+        const result = await pollStatus(res.id); // 폴링 시작
+        console.log('✅ 최종 상태:', result);
+        alert('보이스팩 생성 완료!');
+        navigate('/voice-store');
+      }
+    } catch (error) {
+      console.error('보이스팩 생성 오류:', error);
       alert('보이스팩 생성 실패');
     }
   };
+
 
   const formatTime = (time) => {
     if (typeof time !== 'number' || isNaN(time)) return '00:00';
