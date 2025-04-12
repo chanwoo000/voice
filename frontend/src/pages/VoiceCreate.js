@@ -152,9 +152,11 @@ function VoiceCreate() {
       await convertVoice({
         name: voicePackName,
         blob: audioBlob,
-        userId: sessionStorage.getItem('userId'),
+        // userId: sessionStorage.getItem('userId'),
+        userId:7,
       });
 
+      if (!res.ok) throw new Error();
       alert('보이스팩 생성 완료!');
       navigate('/voice-store');
     } catch {
