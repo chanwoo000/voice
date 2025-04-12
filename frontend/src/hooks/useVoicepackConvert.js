@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import axiosInstance from '../utils/axiosInstance';
 
 const useVoiceConvert = () => {
@@ -14,12 +14,12 @@ const useVoiceConvert = () => {
     const formData = new FormData();
     formData.append('userId', 7); // ✅ userId를 동적으로 받도록 수정
     formData.append('name', voicePackName);
-    formData.append('voiceFile', new File([audioBlob], 'voice.wav', { type: 'audio/wav' }));
+    formData.append('voiceFile', new File([audioBlob], 'voice.wav', {type: 'audio/wav'}));
 
     console.log('✅ userId:', userId); // 현재는 하드코딩 7 → OK
     console.log('✅ name:', voicePackName); // 비어 있으면 ❌
     console.log('✅ audioBlob:', audioBlob); // size가 0이면 ❌
-    console.log('✅ voiceFile File 객체:', new File([audioBlob], 'voice.wav', { type: 'audio/wav' }));
+    console.log('✅ voiceFile File 객체:', new File([audioBlob], 'voice.wav', {type: 'audio/wav'}));
 
     const url = 'voicepack/convert';
     console.log('🌐 전송할 API URL:', axiosInstance.defaults.baseURL + url);
@@ -29,7 +29,9 @@ const useVoiceConvert = () => {
       setError(null);
 
       const response = await axiosInstance.post(url, formData, {
-        headers: {}, // <-- Content-Type 생략!
+        headers: {
+          'Content-Type': undefined, // axios가 자동으로 설정하게 함
+        },
         withCredentials: true,
       });
 
@@ -43,7 +45,7 @@ const useVoiceConvert = () => {
     }
   };
 
-  return { convertVoice, loading, error };
+  return {convertVoice, loading, error};
 };
 
 export default useVoiceConvert;
