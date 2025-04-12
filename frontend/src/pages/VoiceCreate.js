@@ -149,7 +149,7 @@ function VoiceCreate() {
     return new Promise((resolve, reject) => {
       const checkStatus = async () => {
         try {
-          const {data} = await axiosInstance.get(`/voicepack/convert/status/${id}`);
+          const { data } = await axiosInstance.get(`/voicepack/convert/status/${id}`);
           console.log(data)
           if (data.status === 'COMPLETED') {
             resolve(data);
