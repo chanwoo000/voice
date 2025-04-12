@@ -29,6 +29,7 @@ const useVoiceConvert = () => {
       setError(null);
 
       const response = await axiosInstance.post(url, formData, {
+        headers: {}, // <-- Content-Type 생략!
         withCredentials: true,
       });
 
