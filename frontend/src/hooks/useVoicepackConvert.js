@@ -16,7 +16,10 @@ const useVoiceConvert = () => {
     formData.append('name', voicePackName);
     formData.append('voiceFile', new File([audioBlob], 'voice.wav', { type: 'audio/wav' }));
 
-    console.log('🔼 전송할 formData', formData.get('name'), formData.get('userId'));
+    console.log('✅ userId:', userId); // 현재는 하드코딩 7 → OK
+    console.log('✅ name:', voicePackName); // 비어 있으면 ❌
+    console.log('✅ audioBlob:', audioBlob); // size가 0이면 ❌
+    console.log('✅ voiceFile File 객체:', new File([audioBlob], 'voice.wav', { type: 'audio/wav' }));
 
     const url = 'voicepack/convert';
     console.log('🌐 전송할 API URL:', axiosInstance.defaults.baseURL + url);
